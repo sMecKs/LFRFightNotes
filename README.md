@@ -33,8 +33,8 @@ Then `/reload` or restart the client.
 - Optional: `/lfrtips <boss name>` to jump to a boss (partial/normalized match)
 - UI: pick **Raid** and **Boss** from the dropdowns
 - **Auto-detect**: on `ENCOUNTER_START` / boss units, the addon selects the matching boss when possible
-- **Copy**: click **Copy**, then **Ctrl+C** in the edit box, then paste into party/raid chat  
-  (Retail addons cannot write the OS clipboard directly; highlighting an `EditBox` is the compatible approach.)
+- **Send Chat** (recommended): while in LFR/party/raid, click **Send Chat**. The addon posts one short line at a time so nothing gets clipped (WoW chat is ~255 characters). Same thing from slash: `/lfrtips send`
+- **Copy**: still there for Discord/etc — click **Copy**, then **Ctrl+C**. Don't paste the whole block into WoW chat.
 
 ## CurseForge packaging
 

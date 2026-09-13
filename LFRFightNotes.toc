@@ -2,7 +2,7 @@
 ## Title: LFR Fight Notes
 ## Notes: Tiny LFR/raid fight tips for Midnight raids. /lfrtips or /fightnote
 ## Author: sMecKs
-## Version: 1.0.0
+## Version: 1.1.0
 ## SavedVariables: LFRFightNotesDB
 ## DefaultState: enabled
 

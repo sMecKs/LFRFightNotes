@@ -1,7 +1,8 @@
 --[[
   LFRFightNotes — tiny Midnight LFR fight-tip helper.
   Slash: /lfrtips  /fightnote
-  Copy: EditBox highlight (Ctrl+C) — Retail has no general OS clipboard write for addons.
+  Send Chat: posts one line at a time (WoW ~255 char chat cap).
+  Copy: EditBox highlight (Ctrl+C) for Discord/etc.
 ]]
 
 local ADDON = ...
@@ -27,6 +28,73 @@ local function GetBoss(ri, bi)
   local raid = GetRaid(ri)
   if not raid then return nil end
   return raid.bosses[bi or selectedBossIndex]
+end
+
+-- WoW chat is ~255 chars. Send one line at a time to LFR/raid/party.
+local MAX_CHAT = 255
+local SEND_GAP = 0.45
+local sending = false
+
+local function GetChatType()
+  if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+    return "INSTANCE_CHAT"
+  elseif IsInRaid() then
+    return "RAID"
+  elseif IsInGroup() then
+    return "PARTY"
+  end
+  return nil
+end
+
+local function ChatLabel(chatType)
+  if chatType == "INSTANCE_CHAT" then return "instance chat" end
+  if chatType == "RAID" then return "raid" end
+  if chatType == "PARTY" then return "party" end
+  return chatType
+end
+
+local function SplitForChat(text)
+  local lines = {}
+  for raw in string.gmatch(text or "", "[^\n]+") do
+    local line = raw:match("^%s*(.-)%s*$")
+    if line and line ~= "" then
+      while #line > MAX_CHAT do
+        table.insert(lines, line:sub(1, MAX_CHAT))
+        line = line:sub(MAX_CHAT + 1)
+      end
+      table.insert(lines, line)
+    end
+  end
+  return lines
+end
+
+local function SendTipsToChat()
+  local boss = GetBoss()
+  if not boss then
+    Print("No boss selected.")
+    return
+  end
+  local chatType = GetChatType()
+  if not chatType then
+    Print("Not in a group. Join LFR/party/raid first, or use Copy + Ctrl+C.")
+    return
+  end
+  if sending then
+    Print("Already sending — wait a moment.")
+    return
+  end
+  local lines = SplitForChat(boss.tips)
+  table.insert(lines, 1, string.format("[%s] %s", boss.raidName, boss.name))
+  sending = true
+  for i, line in ipairs(lines) do
+    C_Timer.After((i - 1) * SEND_GAP, function()
+      SendChatMessage(line, chatType)
+      if i == #lines then
+        sending = false
+        Print("Sent " .. #lines .. " lines to " .. ChatLabel(chatType) .. ".")
+      end
+    end)
+  end
 end
 
 local function RefreshTips()
@@ -177,24 +245,30 @@ local function CreateUI()
   scroll:SetScrollChild(tipsBox)
 
   local copyBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-  copyBtn:SetSize(100, 24)
-  copyBtn:SetPoint("BOTTOMLEFT", 16, 12)
+  copyBtn:SetSize(72, 24)
+  copyBtn:SetPoint("BOTTOMLEFT", 12, 12)
   copyBtn:SetText("Copy")
   copyBtn:SetScript("OnClick", function()
     tipsBox:SetFocus()
     tipsBox:HighlightText()
-    Print("Tips selected — press |cffffff00Ctrl+C|r to copy, then paste in chat.")
+    Print("Tips selected — press |cffffff00Ctrl+C|r to copy.")
   end)
 
+  local sendBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+  sendBtn:SetSize(96, 24)
+  sendBtn:SetPoint("LEFT", copyBtn, "RIGHT", 6, 0)
+  sendBtn:SetText("Send Chat")
+  sendBtn:SetScript("OnClick", SendTipsToChat)
+
   local closeBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-  closeBtn:SetSize(80, 24)
-  closeBtn:SetPoint("BOTTOMRIGHT", -16, 12)
+  closeBtn:SetSize(72, 24)
+  closeBtn:SetPoint("BOTTOMRIGHT", -12, 12)
   closeBtn:SetText("Close")
   closeBtn:SetScript("OnClick", function() frame:Hide() end)
 
   local detectBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-  detectBtn:SetSize(120, 24)
-  detectBtn:SetPoint("BOTTOM", 0, 12)
+  detectBtn:SetSize(110, 24)
+  detectBtn:SetPoint("RIGHT", closeBtn, "LEFT", -6, 0)
   detectBtn:SetText("Use Detected")
   detectBtn:SetScript("OnClick", function()
     if autoBoss then
@@ -293,6 +367,15 @@ SlashCmdList["LFRFIGHTNOTES"] = function(msg)
   msg = (msg or ""):match("^%s*(.-)%s*$") or ""
   if msg == "" then
     ToggleUI()
+    return
+  end
+  local cmd = msg:lower()
+  if cmd == "send" or cmd == "post" or cmd == "chat" then
+    CreateUI()
+    if autoBoss then
+      SelectBossObject(autoBoss)
+    end
+    SendTipsToChat()
     return
   end
   local boss = Data:FindBoss(msg)
