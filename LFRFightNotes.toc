@@ -1,8 +1,8 @@
 ## Interface: 120100
 ## Title: LFR Fight Notes
-## Notes: Tiny LFR/raid fight tips for Midnight raids. /lfrtips or /fightnote
+## Notes: Short LFR + Mythic+ Season 2 fight tips for Midnight. /lfrtips or /fightnote
 ## Author: sMecKs
-## Version: 1.1.0
+## Version: 1.2.0
 ## SavedVariables: LFRFightNotesDB
 ## DefaultState: enabled
 

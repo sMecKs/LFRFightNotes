@@ -1,14 +1,27 @@
 # LFRFightNotes
 
-Tiny World of Warcraft **Retail (Midnight)** addon with short LFR fight tips for:
+Tiny World of Warcraft **Retail (Midnight)** addon with short fight tips for **LFR raids** and **Mythic+ Season 2** dungeons.
 
+No Ace3. Just a TOC + Lua. Repo root **is** the addon root (`LFRFightNotes.toc` lives at the repository root).
+
+## Content (v1.2.0)
+
+### LFR raids
 1. **The Venomous Abyss**
 2. **The Voidspire**
 3. **The Dreamrift**
 4. **March on Quel'Danas**
 5. **Sporefall**
 
-No Ace3. Just a TOC + Lua. Repo root **is** the addon root (`LFRFightNotes.toc` lives at the repository root).
+### Mythic+ Season 2
+1. **Altar of Fangs** (3) — Rav'i, The Writhing Coil, Zul'jan
+2. **Murder Row** (4) — Kystia Manaheart, Zaen Bladesorrow, Xathuux, Lithiel Cinderfury
+3. **Den of Nalorakk** (3) — The Hoardmonger, Sentinel of Winter, Nalorakk
+4. **The Blinding Vale** (4) — Lightblossom Trinity, Ikuzz, Lightwarden Ruia, Ziekket
+5. **Voidscar Arena** (3) — Taz'Rah, Atroxus, Charonus
+6. **Kings' Rest** (4) — Golden Serpent, Mchimba, Council of Tribes, Dazar
+7. **Temple of Sethraliss** (4) — Adderis & Aspix, Merektha, Galvazzt, Avatar
+8. **Ruby Life Pools** (3) — Melidrussa, Kokia, Kyrakka & Erkhart
 
 ## Install
 
@@ -27,14 +40,22 @@ If you clone this repo, either:
 
 Then `/reload` or restart the client.
 
+**Updating:** download/replace the whole `LFRFightNotes` folder (or `git pull`), then `/reload`.
+
 ## Usage
 
 - Slash commands: **`/lfrtips`** or **`/fightnote`**
 - Optional: `/lfrtips <boss name>` to jump to a boss (partial/normalized match)
-- UI: pick **Raid** and **Boss** from the dropdowns
-- **Auto-detect**: on `ENCOUNTER_START` / boss units, the addon selects the matching boss when possible
-- **Send Chat** (recommended): while in LFR/party/raid, click **Send Chat**. The addon posts one short line at a time so nothing gets clipped (WoW chat is ~255 characters). Same thing from slash: `/lfrtips send`
-- **Copy**: still there for Discord/etc — click **Copy**, then **Ctrl+C**. Don't paste the whole block into WoW chat.
+- `/lfrtips send` — post tips to party/raid/instance chat (one line at a time)
+- `/lfrtips detect` — re-scan boss frames / last encounter
+- UI: pick **Raid / Dungeon** (LFR + M+ sections) and **Boss**
+- **Auto-detect**:
+  - `ENCOUNTER_START` (name + optional encounter ID)
+  - `INSTANCE_ENCOUNTER_ENGAGE_UNIT` + periodic boss1–5 poll in combat / M+
+  - `CHALLENGE_MODE_START` / entering a known dungeon pre-selects that dungeon
+  - Opening `/lfrtips` inside a key maps the instance to the M+ dropdown when possible
+- **Send Chat** (recommended): posts one short line at a time (~255 char WoW chat cap)
+- **Copy**: click **Copy**, then **Ctrl+C** for Discord/etc.
 
 ## CurseForge packaging
 
@@ -48,8 +69,6 @@ LFRFightNotes.zip
     ├── LFRFightNotes.lua
     └── README.md   (optional)
 ```
-
-**Do not** zip so that `.toc` sits at the zip root without the folder — CurseForge / clients expect `AddOns/LFRFightNotes/*.toc`.
 
 Because this git repo’s root *is* the addon root, from a checkout:
 
@@ -65,4 +84,4 @@ cd dist && zip -r LFRFightNotes.zip LFRFightNotes
 
 ## License
 
-All rights reserved unless otherwise noted. Fight tips are community LFR reminders, not a substitute for full guides.
+All rights reserved unless otherwise noted. Fight tips are community LFR/M+ reminders, not a substitute for full guides.
